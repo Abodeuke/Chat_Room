@@ -1,0 +1,160 @@
+s	2024-12-13 09:57:54
+sexit	2024-12-13 09:58:40
+exit	2024-12-13 09:58:44
+s	2024-12-13 10:09:17
+s	2024-12-13 10:09:18
+s	2024-12-13 10:09:18
+s	2024-12-13 10:09:18
+	2024-12-13 10:09:18
+ss	2024-12-13 10:09:19
+s	2024-12-13 10:09:19
+s	2024-12-13 10:09:19
+s	2024-12-13 10:09:20
+s	2024-12-13 10:09:20
+	2024-12-13 10:09:20
+ss	2024-12-13 10:09:20
+s	2024-12-13 10:09:20
+s	2024-12-13 10:09:20
+ss	2024-12-13 10:09:21
+ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssskljfkajf#include <stdio.h>	2024-12-13 10:09:32
+#include <stdlib.h>	2024-12-13 10:09:32
+#include <winsock2.h>	2024-12-13 10:09:32
+#include <pthread.h>	2024-12-13 10:09:32
+#include <ws2tcpip.h>	2024-12-13 10:09:32
+#include <time.h>	2024-12-13 10:09:32
+	2024-12-13 10:09:32
+#define MAX_CLIENTS 5	2024-12-13 10:09:32
+	2024-12-13 10:09:32
+int client_count = 0; // Global counter for connected clients	2024-12-13 10:09:32
+	2024-12-13 10:09:32
+void *handle_client(void *arg) {	2024-12-13 10:09:32
+    struct Client *client = (struct Client *)arg;	2024-12-13 10:09:32
+    int client_socket = client->socket;	2024-12-13 10:09:32
+	2024-12-13 10:09:32
+    // Increment client count	2024-12-13 10:09:32
+    client_count++;	2024-12-13 10:09:32
+    printf("Client connected. Total clients: %d\n", client_count);	2024-12-13 10:09:32
+	2024-12-13 10:09:32
+    // Handle client communication	2024-12-13 10:09:32
+    // ...	2024-12-13 10:09:32
+	2024-12-13 10:09:32
+    // Decrement client count when client disconnects	2024-12-13 10:09:32
+    client_count--;	2024-12-13 10:09:32
+    printf("Client disconnected. Total clients: %d\n", client_count);	2024-12-13 10:09:32
+    closesocket(client_socket);	2024-12-13 10:09:32
+    pthread_exit(NULL);	2024-12-13 10:09:32
+}	2024-12-13 10:09:32
+	2024-12-13 10:09:32
+struct Client {	2024-12-13 10:09:32
+    int socket;	2024-12-13 10:09:32
+    char name[256];	2024-12-13 10:09:32
+    char ip[INET_ADDRSTRLEN];	2024-12-13 10:09:32
+};	2024-12-13 10:09:32
+	2024-12-13 10:09:32
+struct Client clients[MAX_CLIENTS];	2024-12-13 10:09:32
+	2024-12-13 10:09:32
+void *handle_client(void *arg);	2024-12-13 10:09:32
+	2024-12-13 10:09:32
+int main() {	2024-12-13 10:09:32
+    WSADATA wsaData;	2024-12-13 10:09:32
+    if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {	2024-12-13 10:09:32
+        fprintf(stderr, "WSAStartup failed: %d\n", WSAGetLastError());	2024-12-13 10:09:32
+        return 1;	2024-12-13 10:09:32
+    }	2024-12-13 10:09:32
+	2024-12-13 10:09:32
+    int server_socket, client_socket;	2024-12-13 10:09:32
+    struct sockaddr_in server_addr, client_addr;	2024-12-13 10:09:32
+    int client_len = sizeof(client_addr);	2024-12-13 10:09:32
+    pthread_t client_threads[MAX_CLIENTS];	2024-12-13 10:09:32
+    int num_clients = 0;	2024-12-13 10:09:32
+	2024-12-13 10:09:32
+    server_socket = socket(AF_INET, SOCK_STREAM, 0);	2024-12-13 10:09:32
+    if (server_socket == -1) {	2024-12-13 10:09:32
+        fprintf(stderr, "Socket creation failed: %d\n", WSAGetLastError());	2024-12-13 10:09:32
+        WSACleanup();	2024-12-13 10:09:32
+        return 1;	2024-12-13 10:09:32
+    }	2024-12-13 10:09:32
+	2024-12-13 10:09:32
+    server_addr.sin_family = AF_INET;	2024-12-13 10:09:32
+    server_addr.sin_addr.s_addr = htonl(INADDR_ANY);	2024-12-13 10:09:32
+    server_addr.sin_port = htons(12345);	2024-12-13 10:09:32
+	2024-12-13 10:09:32
+    if (bind(server_socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1) {	2024-12-13 10:09:32
+        fprintf(stderr, "Bind failed: %d\n", WSAGetLastError());	2024-12-13 10:09:32
+        closesocket(server_socket);	2024-12-13 10:09:32
+        WSACleanup();	2024-12-13 10:09:32
+        return 1;	2024-12-13 10:09:32
+    }	2024-12-13 10:09:32
+	2024-12-13 10:09:32
+    if (listen(server_socket, 5) == -1) {	2024-12-13 10:09:32
+        fprintf(stderr, "Listen failed: %d\n", WSAGetLastError());	2024-12-13 10:09:32
+        closesocket(server_socket);	2024-12-13 10:09:32
+        WSACleanup();	2024-12-13 10:09:32
+        return 1;	2024-12-13 10:09:32
+    }	2024-12-13 10:09:32
+	2024-12-13 10:09:32
+    while (1) {	2024-12-13 10:09:32
+        client_socket = accept(server_socket, (struct sockaddr *)&client_addr, &client_len);	2024-12-13 10:09:32
+        if (client_socket == -1) {	2024-12-13 10:09:32
+            fprintf(stderr, "Accept failed: %d\n", WSAGetLastError());	2024-12-13 10:09:32
+            continue;	2024-12-13 10:09:32
+        }	2024-12-13 10:09:32
+	2024-12-13 10:09:32
+        char name[256];	2024-12-13 10:09:32
+        ssize_t name_length = recv(client_socket, name, sizeof(name), 0);	2024-12-13 10:09:32
+        if (name_length > 0) {	2024-12-13 10:09:32
+            name[name_length] = '\0';	2024-12-13 10:09:32
+        } else {	2024-12-13 10:09:32
+            fprintf(stderr, "Failed to receive client name\n");	2024-12-13 10:09:32
+            closesocket(client_socket);	2024-12-13 10:09:32
+            continue;	2024-12-13 10:09:32
+        }	2024-12-13 10:09:32
+	2024-12-13 10:09:32
+        if (num_clients < MAX_CLIENTS) {	2024-12-13 10:09:32
+            clients[num_clients].socket = client_socket;	2024-12-13 10:09:32
+            strncpy(clients[num_clients].name, name, sizeof(clients[num_clients].name));	2024-12-13 10:09:32
+            num_clients++;	2024-12-13 10:09:32
+            printf("Client '%s' connected\n", name);	2024-12-13 10:09:32
+            pthread_create(&client_threads[num_clients - 1], NULL, handle_client, (void *)&clients[num_clients - 1]);	2024-12-13 10:09:32
+        } else {	2024-12-13 10:09:32
+            fprintf(stderr, "Maximum clients reached. Connection rejected.\n");	2024-12-13 10:09:32
+            closesocket(client_socket);	2024-12-13 10:09:32
+        }	2024-12-13 10:09:32
+    }	2024-12-13 10:09:32
+	2024-12-13 10:09:32
+    closesocket(server_socket);	2024-12-13 10:09:32
+    WSACleanup();	2024-12-13 10:09:32
+    return 0;	2024-12-13 10:09:32
+}	2024-12-13 10:09:32
+	2024-12-13 10:09:32
+void *handle_client(void *arg) {	2024-12-13 10:09:32
+    struct Client *client = (struct Client *)arg;	2024-12-13 10:09:32
+    int client_socket = client->socket;	2024-12-13 10:09:32
+	2024-12-13 10:09:32
+    while (1) {	2024-12-13 10:09:32
+        char buffer[256];	2024-12-13 10:09:32
+        ssize_t num_bytes = recv(client_socket, buffer, sizeof(buffer), 0);	2024-12-13 10:09:32
+        if (num_bytes <= 0) {	2024-12-13 10:09:32
+            printf("Client '%s' disconnected\n", client->name);	2024-12-13 10:09:32
+            break;	2024-12-13 10:09:32
+        }	2024-12-13 10:09:32
+        buffer[num_bytes] = '\0';	2024-12-13 10:09:32
+        printf("Received from %s: %s\n", client->name, buffer);	2024-12-13 10:09:32
+        	2024-12-13 10:09:32
+        // Broadcast message to all clients (excluding sender)	2024-12-13 10:09:32
+        for (int j = 0; j < MAX_CLIENTS; j++) {	2024-12-13 10:09:32
+            if (clients[j].socket != -1 && clients[j].socket != client_socket) {	2024-12-13 10:09:32
+                send(clients[j].socket, buffer, strlen(buffer), 0);	2024-12-13 10:09:32
+            }	2024-12-13 10:09:32
+        }	2024-12-13 10:09:32
+    }	2024-12-13 10:09:32
+    closesocket(client_socket);	2024-12-13 10:09:32
+    pthread_exit(NULL);	2024-12-13 10:09:32
+}	2024-12-13 10:09:33
+s	2024-12-13 10:26:16
+s	2024-12-13 10:26:16
+s	2024-12-13 10:26:16
+s	2024-12-13 10:26:17
+s	2024-12-13 10:26:17
+s	2024-12-13 10:26:17
+s	2024-12-13 10:26:17
